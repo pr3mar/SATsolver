@@ -11,6 +11,10 @@
       "stopOnEntry": true,
       "pythonPath": "${config:python.pythonPath}",
       "program": "${file}",
+      "args": [
+        "inputs/input1",
+        "output/output1"
+      ],
       "cwd": "${workspaceRoot}",
       "env": {},
       "envFile": "${workspaceRoot}/.env",
