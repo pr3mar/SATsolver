@@ -9,8 +9,8 @@
       "command": "python",
       "args": [
         "solver.py",
-        "inputs/input1",
-        "output/output1"
+        "inputs/sudoku_hard.txt",
+        "outputs/output_sudoku_hard.txt"
       ],
       "problemMatcher": []
     }
