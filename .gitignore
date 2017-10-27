@@ -1,3 +1,5 @@
 __pycache__*
 old*
 outputs*
+reducers.py
+nqueen.py
