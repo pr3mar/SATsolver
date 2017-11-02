@@ -1,4 +1,5 @@
 from random import shuffle
+import copy
 import re, sys
 
 # parse CNF files
@@ -25,10 +26,34 @@ def parse_inst(input_file):
             parsed.append(cl)
     return parsed, dict.fromkeys(vars, None)
 
+# def simplify(formula, valuations, add=None):
+#     if not (add is None):
+#         formula.insert(0, add)
+#     id = 0
+#     while id < len(formula): # identify all the unit clauses
+#         if len(formula[id]) == 1:
+#             val = formula[id][0]
+#             valuations[abs(val)] = val > 0 # value needed to be true
+#             iid = 0
+#             while iid < len(formula): # remove all clauses where the unit literal appears
+#                 if val in formula[iid]:
+#                     formula.remove(formula[iid])
+#                     iid = 0
+#                     continue
+#                 # formula[iid] = [e for e in formula[iid] if e not in (literalToRemove & set(formula[iid]))]
+#                 if -val in formula[iid]:
+#                     formula[iid].remove(-val)
+#                 iid += 1
+#             id = 0
+#         else:
+#             id += 1
+#     return formula, valuations
+## modified simplify
 def simplify(formula, valuations, add=None):
     if not (add is None):
         formula.insert(0, add)
     id = 0
+    # print(formula)
     while id < len(formula): # identify all the unit clauses
         if len(formula[id]) == 1:
             val = formula[id][0]
@@ -37,16 +62,19 @@ def simplify(formula, valuations, add=None):
             while iid < len(formula): # remove all clauses where the unit literal appears
                 if val in formula[iid]:
                     formula.remove(formula[iid])
-                    iid = 0
-                    continue
-                # formula[iid] = [e for e in formula[iid] if e not in (literalToRemove & set(formula[iid]))]
-                if -val in formula[iid]:
+                    iid -= 1
+                    # print(formula)
+                elif -val in formula[iid]:
                     formula[iid].remove(-val)
+                    # print(formula)
                 iid += 1
             id = 0
         else:
             id += 1
+    # print(formula)
+    # print(" ")
     return formula, valuations
+
 
 # def selective_simplify(formula, valuations, add):
 #     if = 0
@@ -76,27 +104,36 @@ def SATsolver(formula, valuations, add=None):
     if [] in formula: # if there is an empty clause in the formula, the formula is not satisfied
         raise Exception('Contradiction!')
     shuffled_list = [e for e, x in valuations.items() if x is None]
-    shuffle(shuffled_list)
+    # print(valuations)
+    # shuffle(shuffled_list)
     for literal in shuffled_list:
         value = valuations[literal]
+        # print(literal)
         try:
-            return SATsolver(list(formula), dict(valuations), [literal])
+            # print("Before positive:", valuations)
+            return SATsolver(copy.deepcopy(formula), copy.deepcopy(valuations), [literal])
         except Exception:
-            return SATsolver(list(formula), dict(valuations), [-literal])
+            try:
+                # print("Before negative:", valuations)
+                return SATsolver(list(formula), dict(valuations), [-literal])
+            except Exception:
+                continue
             # if calc_valuations is None: # try assigning a Falce value to the picked literal
             #     return SATsolver(list(formula), dict(valuations), [-literal])
             # else: # return the result if it exists
             #     return calc_valuations
+    raise Exception('No match!')
 
 formula, variables = parse_inst('inputs/input2')
 
 try:
+    print('Finding solution:')
     solution = SATsolver(formula, variables)
 except Exception as contradiction:
     print('FAIL:', contradiction)
     sys.exit(0)
 
-print(solution)
+print('Final solution', solution)
 # with open('outputs/sudoku_easy.txt', 'w') as file:
 #     if solution == None:
 #         print("FAIL")
