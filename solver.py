@@ -1,5 +1,7 @@
 from random import shuffle
 import re, sys, copy, time, argparse, os.path
+import itertools
+from collections import Counter
 
 def is_valid_file(parser, arg):
     if not os.path.exists(arg):
@@ -8,7 +10,7 @@ def is_valid_file(parser, arg):
         return arg
 
 def parse_args():
-    parser = argparse.ArgumentParser(description='SAT solver by Marko Prelevikj and Luka Zlatečan')
+    parser = argparse.ArgumentParser(description='SAT solver by Marko Prelevikj and Luka Zlatecan')
     parser.add_argument('-i', '--input', required=True, default='empty',
                             help='[required] Input file', metavar="FILE",
                                 type=lambda x: is_valid_file(parser, x))
@@ -55,16 +57,14 @@ def simplify(formula, valuations, add=None):
                 if val in formula[iid]:
                     formula.remove(formula[iid])
                     iid -= 1
-                    # print(formula)
                 elif -val in formula[iid]:
                     formula[iid].remove(-val)
-                    # print(formula)
+                    if(len(formula[iid]) == 0):
+                        return formula, valuations
                 iid += 1
             id = 0
         else:
             id += 1
-    # print(formula)
-    # print(' ')
     return formula, valuations
 
 def SATsolver(formula, valuations, add=None):
@@ -74,48 +74,94 @@ def SATsolver(formula, valuations, add=None):
     if [] in formula: # if there is an empty clause in the formula, the formula is not satisfied
         raise Exception('Contradiction!')
     shuffled_list = [e for e, x in valuations.items() if x is None]
-    # print(valuations)
-    # shuffle(shuffled_list)
+    shuffle(shuffled_list)
     for literal in shuffled_list:
         value = valuations[literal]
-        # print(literal)
         try:
-            # print('Before positive:', valuations)
             return SATsolver(copy.deepcopy(formula), copy.deepcopy(valuations), [literal])
         except Exception:
             try:
-                # print('Before negative:', valuations)
                 return SATsolver(list(formula), dict(valuations), [-literal])
             except Exception:
                 continue
-            # if calc_valuations is None: # try assigning a Falce value to the picked literal
-            #     return SATsolver(list(formula), dict(valuations), [-literal])
-            # else: # return the result if it exists
-            #     return calc_valuations
     raise Exception('No match!')
 
+def findMaxOccList(formula):
+    totals = Counter(i for i in map(abs, list(itertools.chain.from_iterable(formula))))
+    return sorted(totals, key=totals.get, reverse=True)
 
+def SATsolverMax(formula, valuations, add=None):
+    formula, valuations = simplify(formula, valuations, add)
+    if formula == []: # if we managed to empty the list, the formula is satisfied
+        return valuations
+    if [] in formula: # if there is an empty clause in the formula, the formula is not satisfied
+        raise Exception('Contradiction!')
+    maxOcc_list = findMaxOccList(formula)
+    for literal in maxOcc_list:
+        value = valuations[literal]
+        try:
+            return SATsolverMax(copy.deepcopy(formula), copy.deepcopy(valuations), [literal])
+        except Exception:
+            try:
+                return SATsolverMax(list(formula), dict(valuations), [-literal])
+            except Exception:
+                continue
+    raise Exception('No match!')
+
+def findMaxOcc(formula):
+    totals = Counter(i for i in map(abs, list(itertools.chain.from_iterable(formula))))
+    return sorted(totals, key=totals.get, reverse=True)[0]
+
+def SATsolverMaxBin(formula, valuations, add=None):
+    formula, valuations = simplify(formula, valuations, add)
+    if formula == []: # if we managed to empty the list, the formula is satisfied
+        return valuations
+    if [] in formula: # if there is an empty clause in the formula, the formula is not satisfied
+        raise Exception('Contradiction!')
+    maxOcc_el = findMaxOcc(formula)
+    try:
+        return SATsolverMaxBin(copy.deepcopy(formula), copy.deepcopy(valuations), [maxOcc_el])
+    except Exception:
+        try:
+            return SATsolverMaxBin(list(formula), dict(valuations), [-maxOcc_el])
+        except Exception:
+            raise Exception('No match!')
+    
 def main():
     args = parse_args()
     formula, variables = parse_inst(args.input)
+    findMaxOcc(formula)
     try:
-        print('Finding solution:')
+        #Shuffle
+        print('Finding solution for shuffler:')
         time_started = time.time()
         solution = SATsolver(formula, variables)
+        time_ended = time.time()
+        print('Execution time:', time_ended - time_started)
+        #Max occurrence
+        print('Finding solution for max occurrence:')
+        time_started = time.time()
+        solution = SATsolverMax(formula, variables)
+        time_ended = time.time()
+        print('Execution time:', time_ended - time_started)
+        #Max occurrence binary
+        print('Finding solution for binary max occurrence:')
+        time_started = time.time()
+        solution = SATsolverMaxBin(formula, variables)
         time_ended = time.time()
         print('Execution time:', time_ended - time_started)
     except Exception as error:
         solution = None
 
-    # print('Final solution', solution)
-    with open(args.output, 'w') as file:
-        if solution is None:
-            print('FAIL')
-            file.write('0');
-        else:
-            print('SUCCESS')
-            for x, y in solution.items():
-                file.write('{} '.format(x if y else -x))
+    print('Final solution', solution)
+    # with open(args.output, 'w') as file:
+    #     if solution is None:
+    #         print('FAIL')
+    #         file.write('0');
+    #     else:
+    #         print('SUCCESS')
+    #         for x, y in solution.items():
+    #             file.write('{} '.format(x if y else -x))
 
 if __name__ == '__main__':
     main()
