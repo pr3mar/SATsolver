@@ -12,8 +12,10 @@
       "pythonPath": "${config:python.pythonPath}",
       "program": "${file}",
       "args": [
-        "inputs/sudoku_mini.txt",
-        "output/output1"
+        "-i",
+        "inputs/input1",
+        "-o",
+        "output/out_input1"
       ],
       "cwd": "${workspaceRoot}",
       "env": {},

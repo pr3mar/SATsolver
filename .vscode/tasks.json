@@ -10,9 +10,9 @@
       "args": [
         "solver.py",
         "-i",
-        "inputs/sudoku_hard.txt",
+        "inputs/input2",
         "-o",
-        "outputs/out_sudoku_hard.txt"
+        "outputs/out_input2"
       ],
       "problemMatcher": []
     }

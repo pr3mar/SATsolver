@@ -1,7 +1,8 @@
-from random import shuffle
 import re, sys, copy, time, argparse, os.path
 import itertools
+from random import shuffle
 from collections import Counter
+from eval import eval
 
 def is_valid_file(parser, arg):
     if not os.path.exists(arg):
@@ -16,6 +17,8 @@ def parse_args():
                                 type=lambda x: is_valid_file(parser, x))
     parser.add_argument('-o', '--output', required=True, default='empty',
                             help='[required] Output file', metavar="FILE")
+    parser.add_argument('-m', '--method', required=False, default='all',
+                            help='[optional] Method to solve the problem. Available options: (greedy|shuffle|max|bin|all)')
     args = parser.parse_args()    
     return args
 
@@ -74,6 +77,24 @@ def SATsolver(formula, valuations, add=None):
     if [] in formula: # if there is an empty clause in the formula, the formula is not satisfied
         raise Exception('Contradiction!')
     shuffled_list = [e for e, x in valuations.items() if x is None]
+    for literal in shuffled_list:
+        value = valuations[literal]
+        try:
+            return SATsolver(copy.deepcopy(formula), copy.deepcopy(valuations), [literal])
+        except Exception:
+            try:
+                return SATsolver(list(formula), dict(valuations), [-literal])
+            except Exception:
+                continue
+    raise Exception('No match!')
+
+def SATsolverShuffle(formula, valuations, add=None):
+    formula, valuations = simplify(formula, valuations, add)
+    if formula == []: # if we managed to empty the list, the formula is satisfied
+        return valuations
+    if [] in formula: # if there is an empty clause in the formula, the formula is not satisfied
+        raise Exception('Contradiction!')
+    shuffled_list = [e for e, x in valuations.items() if x is None]
     shuffle(shuffled_list)
     for literal in shuffled_list:
         value = valuations[literal]
@@ -126,42 +147,50 @@ def SATsolverMaxBin(formula, valuations, add=None):
             return SATsolverMaxBin(list(formula), dict(valuations), [-maxOcc_el])
         except Exception:
             raise Exception('No match!')
+
+def obtainSolution(formula, variables, solverType, solver):
+    print('[{}] Finding solution:'.format(solverType))
+    time_started = time.time()
+    solution = solver(copy.deepcopy(formula), copy.deepcopy(variables))
+    check = eval(formula, solution)
+    print("[{}] Solution check = {}".format(solverType, check))
+    solution = solution if check else None
+    time_ended = time.time()
+    print('[{}] Execution time: {}'.format(solverType, time_ended - time_started))
+    return (check, solution)
     
 def main():
     args = parse_args()
     formula, variables = parse_inst(args.input)
     findMaxOcc(formula)
-    try:
-        #Shuffle
-        print('Finding solution for shuffler:')
-        time_started = time.time()
-        solution = SATsolver(formula, variables)
-        time_ended = time.time()
-        print('Execution time:', time_ended - time_started)
-        #Max occurrence
-        print('Finding solution for max occurrence:')
-        time_started = time.time()
-        solution = SATsolverMax(formula, variables)
-        time_ended = time.time()
-        print('Execution time:', time_ended - time_started)
-        #Max occurrence binary
-        print('Finding solution for binary max occurrence:')
-        time_started = time.time()
-        solution = SATsolverMaxBin(formula, variables)
-        time_ended = time.time()
-        print('Execution time:', time_ended - time_started)
+    try: # greedy|shuffle|max|bin
+        if (args.method == 'greedy'):
+            check_greedy, solution_greedy = obtainSolution(formula, variables, 'greedy', SATsolver)
+        elif args.method == 'shuffle':
+            check_shuffle, solution_shuffle = obtainSolution(formula, variables, 'shuffler', SATsolverShuffle)
+        elif args.method == 'max':
+            check_max, solution_max = obtainSolution(formula, variables, 'max occurences', SATsolverMax)
+        elif args.method == 'bin':
+            check_bin, solution_bin = obtainSolution(formula, variables, 'binary max occurrence', SATsolverMaxBin)
+        elif args.method == 'all':
+            check_greedy, solution_greedy = obtainSolution(formula, variables, 'greedy', SATsolver)
+            check_shuffle, solution_shuffle = obtainSolution(formula, variables, 'shuffler', SATsolverShuffle)
+            check_max, solution_max = obtainSolution(formula, variables, 'max occurences', SATsolverMax)
+            check_bin, solution_bin = obtainSolution(formula, variables, 'binary max occurrence', SATsolverMaxBin)
+        else:
+            print('No such option!')
+            sys.exit(-1)
     except Exception as error:
-        solution = None
+        print('FAIL', error)
 
-    print('Final solution', solution)
     # with open(args.output, 'w') as file:
     #     if solution is None:
     #         print('FAIL')
-    #         file.write('0');
+    #         # file.write('0');
     #     else:
     #         print('SUCCESS')
-    #         for x, y in solution.items():
-    #             file.write('{} '.format(x if y else -x))
+            # for x, y in solution.items():
+                # file.write('{} '.format(x if y else -x))
 
 if __name__ == '__main__':
     main()
