@@ -8,7 +8,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-For running this project you need have Python installed on your local machine.
+For running this project you need to have Python installed on your local machine.
 
 ### Installing
 
@@ -31,6 +31,10 @@ python solver.py -i input.txt -o output.txt -m bin
 * **-i/--input** [required] -> Input file
 * **-o/--output** [required] -> Output file 
 * **-m/--method** [optional] -> Method to solve the problem. Available options: (greedy|shuffle|max|bin|all)
+
+### Examples
+
+There are some prepared input files inside **/inputs** folder.
 
 ## Authors
 
