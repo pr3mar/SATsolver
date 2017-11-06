@@ -148,7 +148,7 @@ def SATsolverMaxBin(formula, valuations, add=None):
         except Exception:
             raise Exception('No match!')
 
-def obtainSolution(formula, variables, solverType, solver):
+def obtainSolution(formula, variables, solverType, solver, output_file):
     print('[{}] Finding solution:'.format(solverType))
     time_started = time.time()
     solution = solver(copy.deepcopy(formula), copy.deepcopy(variables))
@@ -157,6 +157,17 @@ def obtainSolution(formula, variables, solverType, solver):
     solution = solution if check else None
     time_ended = time.time()
     print('[{}] Execution time: {}'.format(solverType, time_ended - time_started))
+
+    writeTo = os.path.join(os.path.dirname(output_file), 'out_{}_'.format(solverType) + os.path.basename(output_file))
+    with open(writeTo, 'w') as file:
+        if solution is None:
+            print('FAIL')
+            file.write('0');
+        else:
+            print('SUCCESS')
+            for x, y in solution.items():
+                file.write('{} '.format(x if y else -x))
+
     return (check, solution)
     
 def main():
@@ -165,32 +176,24 @@ def main():
     findMaxOcc(formula)
     try: # greedy|shuffle|max|bin
         if (args.method == 'greedy'):
-            check_greedy, solution_greedy = obtainSolution(formula, variables, 'greedy', SATsolver)
+            check_greedy, solution_greedy = obtainSolution(formula, variables, 'greedy', SATsolver, args.output)
         elif args.method == 'shuffle':
-            check_shuffle, solution_shuffle = obtainSolution(formula, variables, 'shuffler', SATsolverShuffle)
+            check_shuffle, solution_shuffle = obtainSolution(formula, variables, 'shuffler', SATsolverShuffle, args.output)
         elif args.method == 'max':
-            check_max, solution_max = obtainSolution(formula, variables, 'max occurences', SATsolverMax)
+            check_max, solution_max = obtainSolution(formula, variables, 'max-occ', SATsolverMax, args.output)
         elif args.method == 'bin':
-            check_bin, solution_bin = obtainSolution(formula, variables, 'binary max occurrence', SATsolverMaxBin)
+            check_bin, solution_bin = obtainSolution(formula, variables, 'bin-max-occ', SATsolverMaxBin, args.output)
         elif args.method == 'all':
-            check_greedy, solution_greedy = obtainSolution(formula, variables, 'greedy', SATsolver)
-            check_shuffle, solution_shuffle = obtainSolution(formula, variables, 'shuffler', SATsolverShuffle)
-            check_max, solution_max = obtainSolution(formula, variables, 'max occurences', SATsolverMax)
-            check_bin, solution_bin = obtainSolution(formula, variables, 'binary max occurrence', SATsolverMaxBin)
+            check_greedy, solution_greedy = obtainSolution(formula, variables, 'greedy', SATsolver, args.output)
+            check_shuffle, solution_shuffle = obtainSolution(formula, variables, 'shuffler', SATsolverShuffle, args.output)
+            check_max, solution_max = obtainSolution(formula, variables, 'max-occ', SATsolverMax, args.output)
+            check_bin, solution_bin = obtainSolution(formula, variables, 'bin-max-occ', SATsolverMaxBin, args.output)
         else:
             print('No such option!')
             sys.exit(-1)
     except Exception as error:
         print('FAIL', error)
 
-    # with open(args.output, 'w') as file:
-    #     if solution is None:
-    #         print('FAIL')
-    #         # file.write('0');
-    #     else:
-    #         print('SUCCESS')
-            # for x, y in solution.items():
-                # file.write('{} '.format(x if y else -x))
 
 if __name__ == '__main__':
     main()

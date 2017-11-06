@@ -12,7 +12,9 @@
         "-i",
         "inputs/input2",
         "-o",
-        "outputs/out_input2"
+        "outputs/input2",
+        "-m",
+        "max"
       ],
       "problemMatcher": []
     }

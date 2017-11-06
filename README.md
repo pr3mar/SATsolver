@@ -25,12 +25,17 @@ Run test with following comand:
 ```
 python solver.py -i input.txt -o output.txt -m bin
 ```
-
+The output is going to be stored in a file named by the following convention:
+```
+<output file directory>/out_<method>_<provided file name with suffix>
+```
+where method is: 
+`greedy, shuffle, max_occ, bin_max_occ`
 ### Arguments
 
-* **-i/--input** [required] -> Input file
-* **-o/--output** [required] -> Output file 
-* **-m/--method** [optional] -> Method to solve the problem. Available options: (greedy|shuffle|max|bin|all)
+* **-i/--input** [required] -> Input file name
+* **-o/--output** [required] -> Output file name
+* **-m/--method** [optional] -> Method to solve the problem. Available options: (all|greedy|shuffle|max|bin). Default is `all`
 
 ### Examples
 
@@ -38,5 +43,5 @@ There are some prepared input files inside **/inputs** folder.
 
 ## Authors
 
-* **Marko Prevelikj**
+* **Marko Prelevikj**
 * **Luka Zlatečan**
