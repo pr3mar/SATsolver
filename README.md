@@ -31,6 +31,8 @@ python solver.py -i inputs/input2 -o outputs/output2 -m max
 ```
 where method is: 
 `greedy, shuffle, max_occ, bin_max_occ`
+
+To show strength of our solver we found an input with 497 variables and 5727 clauses which our solver managed to solve it under 3 seconds. Mentioned input is stored in **/inputs** folder and is named **input3.txt**
 ### Arguments
 
 * **-i/--input** [required] -> Input file name
