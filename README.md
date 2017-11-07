@@ -23,9 +23,9 @@ git clone https://github.com/pr3mar/SATsolver.git
 Run test with following comand:
 
 ```
-python solver.py -i input.txt -o output.txt -m bin
+python solver.py -i inputs/input2 -o outputs/output2 -m max
 ```
-The output is going to be stored in a file named by the following convention:
+[not applicable since [issue #1](https://github.com/pr3mar/SATsolver/issues/1)] The output is going to be stored in a file named by the following convention:
 ```
 <output file directory>/out_<method>_<provided file name with suffix>
 ```

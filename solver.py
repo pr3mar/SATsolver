@@ -158,7 +158,8 @@ def obtainSolution(formula, variables, solverType, solver, output_file):
     time_ended = time.time()
     print('[{}] Execution time: {}'.format(solverType, time_ended - time_started))
 
-    writeTo = os.path.join(os.path.dirname(output_file), 'out_{}_'.format(solverType) + os.path.basename(output_file))
+    # writeTo = os.path.join(os.path.dirname(output_file), 'out_{}_'.format(solverType) + os.path.basename(output_file))
+    writeTo = output_file
     with open(writeTo, 'w') as file:
         if solution is None:
             print('FAIL')
