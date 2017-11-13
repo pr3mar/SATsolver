@@ -10,11 +10,11 @@
       "args": [
         "solver.py",
         "-i",
-        "inputs/input2",
+        "inputs/nqueen.in",
         "-o",
-        "outputs/input2",
+        "outputs/nqueen.out",
         "-m",
-        "max"
+        "bin"
       ],
       "problemMatcher": []
     }

@@ -13,9 +13,9 @@
       "program": "${file}",
       "args": [
         "-i",
-        "inputs/input1",
+        "inputs/nqueen.in",
         "-o",
-        "output/out_input1"
+        "outputs/nqueen.out"
       ],
       "cwd": "${workspaceRoot}",
       "env": {},

@@ -8,7 +8,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-For running this project you need to have Python installed on your local machine.
+For running this project you need to have Python 3.6 installed on your local machine.
 
 ### Installing
 
@@ -16,6 +16,7 @@ Download project with git clone command.
 
 ```
 git clone https://github.com/pr3mar/SATsolver.git
+git checkout ara # this is the branch for the ARA subject
 ```
 
 ## Running the tests
@@ -39,11 +40,14 @@ Run this test with this command:
 python solver.py -i inputs/input3.txt -o outputs/output3.txt -m bin
 ```
 
+### N-Queens reducer
+In the file `nqueen.py` is the reducer used to generate the input for the SAT solver for the N-Queens problem. 
+
 ### Arguments
 
 * **-i/--input** [required] -> Input file name
 * **-o/--output** [required] -> Output file name
-* **-m/--method** [optional] -> Method to solve the problem. Available options: (all|greedy|shuffle|max|bin). Default is `all`
+* **-m/--method** [optional] -> Method to solve the problem. Available options: (all|greedy|shuffle|max|bin). The default option is `all`
 
 ### Examples
 
